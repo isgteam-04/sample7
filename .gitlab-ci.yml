@@ -10,10 +10,10 @@ before_script:
 - docker info
 - apk update
 - apk upgrade
-- apk add python python-dev py-pip build-base
+- apk add docker-php-ext-install mysqli
 - pip install docker-compose
 
 build:
   stage: build
   script:
-  - docker-compose -f docker-compose.test.yml build
+  - docker-compose -f docker-compose.yml build
