@@ -19,8 +19,8 @@ step-deploy-prod:
     only:
         - master
     script:
-        - sudo apt-get update -y
-        - sudo apt-get install -y docker-php-ext-install mysqli
+        - docker apt-get update -y
+        - docker apt-get install -y docker-php-ext-install mysqli
         - docker-compose up -d --build
         
     environment: master
