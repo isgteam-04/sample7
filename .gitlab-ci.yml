@@ -1,9 +1,27 @@
-image:  docker:stable
+image:  docker
 
 services:
     - docker:dind
     
-build:
-    stage:  build
+stages:
+    - test
+    - deploy
+    
+test:
+    stage: test
+    only:
+        - master
     script:
-        - docker runn Hello World
+        - echo run test in this section
+        
+step-deploy-prod:
+    stage: deploy
+    only:
+        - master
+    script:
+        - sudo apt-get update -y
+        - sudo apt-get install -y phpunit php5-mysql
+        - docker-compose up -d --build
+        
+    environment: master
+    when: manual
