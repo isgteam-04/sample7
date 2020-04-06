@@ -19,9 +19,12 @@ step-deploy-prod:
     only:
         - master
     script:
-        - docker apt-get update -y
-        - docker apt-get install -y docker-php-ext-install mysqli
-        - docker-compose up -d --build
+        - FROM php:${PHP_VERSION:+${PHP_VERSION}-}fpm-alpine
+            RUN apk update; \
+                apk upgrade;
+            
+            RUN docker-php-ext-install mysqli
+        - docker-compose up
         
     environment: master
     when: manual
