@@ -10,7 +10,15 @@ services:
   - docker:dind
 
 stages:
-- build_images
+    - test
+    - deploy
+    
+test:
+    stage: test
+    only:
+        - master
+    script:
+        - echo run test in this section
 
 before_script:
   - docker version
@@ -18,8 +26,9 @@ before_script:
   - docker login -u $CI_REGISTRY_USER -p $CI_JOB_TOKEN $CI_REGISTRY
     
 step-deploy-prod:
-    stage: build_images
-    script:
+    stage: deploy
+    only:
+        - master
     script:
         - docker-compose down
         - docker-compose build
