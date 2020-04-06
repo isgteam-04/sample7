@@ -1,30 +1,15 @@
-image: docker
+image: docker:latest
+
+variables:
+  DOCKER_DRIVER: overlay
 
 services:
-    - docker:dind
-    
-stages:
-    - test
-    - deploy
-    
-test:
-    stage: test
-    only:
-        - master
-    script:
-        - echo run test in this section
-        
-step-deploy-prod:
-    stage: deploy
-    only:
-        - master
-    script:
-        - FROM php:${PHP_VERSION:+${PHP_VERSION}-}fpm-alpine
-            RUN apk update; \
-                apk upgrade;
-            
-            RUN docker-php-ext-install mysqli
-        - docker-compose up
-        
-    environment: master
-    when: manual
+- docker:dind
+
+before_script:
+- docker info
+
+build:
+  stage: build
+  script:
+  - docker-compose -f docker-compose.yml build
