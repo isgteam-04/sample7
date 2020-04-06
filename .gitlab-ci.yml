@@ -19,9 +19,6 @@ step-deploy-prod:
     only:
         - master
     script:
-        - sudo apt-get update -y
-        - sudo apt-get install -y phpunit php5-mysql
-        - docker-compose up -d --build
-        
+        - docker-compose up
     environment: master
     when: manual
