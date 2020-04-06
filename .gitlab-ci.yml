@@ -1,7 +1,29 @@
-ARG PHP_VERSION=""
-FROM php:${PHP_VERSION:+${PHP_VERSION}-}fpm-alpine
+image: golang:latest-alpine
 
-RUN apk update; \
-    apk upgrade;
+variables:
+    REPO_NAME: gitlab.com/isgteam/sample5
+    
+before_script:
+    - mkdir -p $GOPATH/src/$(dirname $REPO_NAME)
+    - ln -svf $CI_PROJECT_DIR $GOPATH/src/$REPO_NAME
+    - cd $GOPATH/src/$REPO_NAME
 
-RUN docker-php-ext-install mysqli
+stages:
+    - build
+    - run
+
+compile-linux:
+    stage: build
+    script:
+      - go build -o mybinary
+    artifacts:
+      paths:
+        - mybinary
+
+run:
+    stage: run
+    image: alpine
+    script:
+      - apk add ca-certificates
+      - ls -la ./mybinary
+      - ./mybinary -app=${APP_ID} -secret=${SECRET} -output=output.ext
