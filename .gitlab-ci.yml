@@ -1,4 +1,4 @@
-image: golang:latest-alpine
+image: golang:latest
 
 variables:
     REPO_NAME: gitlab.com/isgteam/sample5
