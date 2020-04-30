@@ -27,4 +27,5 @@ stages:
         dockerfile: '$(Build.SourcesDirectory)/apache/Dockerfile'
         tags: |
           $(tag)
-    - task: PublishBuildArtifacts@1
+        sourceFolder: $(Build.SourcesDirectory)
+        targetFolder: $(Build.ArtifactStagingDirectory)
