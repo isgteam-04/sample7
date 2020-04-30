@@ -1,39 +1,39 @@
-# Docker
-# Build and push an image to Azure Container Registry
-# https://docs.microsoft.com/azure/devops/pipelines/languages/docker
+ # Agent VM image name
+ vmImageName: 'ubuntu-latest'
+ 
+ variables:
+  DOCKER_HOST: tcp://docker:2375/
+  DOCKER_DRIVER: overlay2
 
-trigger:
-- master
-
-resources:
-- repo: self
-
-variables:
-  # Container registry service connection established during pipeline creation
-  dockerRegistryServiceConnection: '{{ containerRegistryConnection.Id }}'
-  imageRepository: '{{#toAlphaNumericString imageRepository 50}}{{/toAlphaNumericString}}'
-  containerRegistry: '{{ containerRegistryConnection.Authorization.Parameters.loginServer }}'
-  dockerfilePath: '{{ dockerfilePath }}'
-  tag: '$(Build.BuildId)'
-  
-  # Agent VM image name
-  vmImageName: 'ubuntu-latest'
+services:
+  - docker:dind
 
 stages:
-- stage: Build
-  displayName: Build and push stage
-  jobs:  
-  - job: Build
-    displayName: Build
-    pool:
+    - test
+    - deploy
+    
+test:
+    stage: test
+    only:
+        - master
+    script:
+        - echo run test in this section
+
+before_script:
+  - docker version
+  - docker-compose version
+  - docker login -u $CI_REGISTRY_USER -p $CI_JOB_TOKEN $CI_REGISTRY
+    
+step-deploy-prod:
+    stage: deploy
+      pool:
       vmImage: $(vmImageName)
-    steps:
-    - task: Docker@2
-      displayName: Build and push an image to container registry
-      inputs:
-        command: buildAndPush
-        repository: $(imageRepository)
-        dockerfile: $(dockerfilePath)
-        containerRegistry: $(dockerRegistryServiceConnection)
-        tags: |
-          $(tag)
+    only:
+        - master
+    script:
+        - docker-compose down
+        - docker-compose build
+        - docker-compose push
+    
+    environment: production
+    when: manual
